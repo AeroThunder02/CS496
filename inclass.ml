@@ -1,0 +1,41 @@
+type fruit = A | O | K
+type fbasket = fruit list
+let fb1 = [A;A;O;A;K;A]
+
+type 'a result = Ok of 'a | Error of string
+ 
+let num_apples : fbasket -> int result =
+ fun fb ->
+ Ok (List.length (List.filter (fun f -> f=A) fb))
+
+let num_oranges : fbasket -> int result =
+ fun fb ->
+ Ok (List.length (List.filter (fun f -> f=O) fb))
+
+let has_oranges : fbasket -> bool result =
+ fun fb ->
+ Ok (List.mem O fb)
+
+let rec remover_first_orange =
+ fun fb ->
+ match fb with 
+ |[] -> []
+ |O::t -> t
+ |f::t -> f :: remover_first_orange t
+
+let remove_orange : fbasket -> fbasket result =
+ fun fb ->
+ if List.mem O fb
+  then Ok(remover_first_orange fb)
+  else Error "no oranges"
+
+let sum_fpb : (fbasket -> int result) -> (fbasket -> int result) -> (fbasket -> int result) =
+ fun fbp1 fbp2 ->
+ fun fb ->
+ match fbp1 fb with 
+ | Error s -> Error s
+ | Ok n ->
+  (match fbp2 fb with
+  | Error s -> Error s
+  | Ok m -> Ok (n+m))
+
